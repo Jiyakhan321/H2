@@ -131,9 +131,40 @@ npm run test
 
 The application is designed to be deployed with:
 
-- Backend: Hosted on a cloud provider supporting Python/FastAPI
-- Frontend: Deployed on Vercel, Netlify, or similar platform
+- Backend: Hosted on a cloud provider supporting Python/FastAPI (e.g., Render.com, Railway.app)
+- Frontend: Deployed on Vercel, Netlify, GitHub Pages, or similar platform
 - Database: Neon Serverless PostgreSQL
+
+### GitHub Pages Deployment (Static Export)
+
+To deploy the frontend to GitHub Pages:
+
+1. The project is configured with GitHub Actions workflow for automated deployment
+2. The workflow is located at `.github/workflows/github-pages.yml`
+3. The Next.js app is configured for static export in `frontend/next.config.js`
+4. Environment variables are managed through GitHub Secrets
+
+#### Setup GitHub Pages:
+
+1. Go to your repository Settings → Pages
+2. Under "Source", select "GitHub Actions"
+3. Go to Settings → Secrets and variables → Actions
+4. Add a new secret:
+   - Name: `NEXT_PUBLIC_API_BASE_URL`
+   - Value: Your backend API URL (e.g., `https://your-backend.onrender.com`)
+
+5. The workflow will automatically build and deploy when you push to `main` branch
+
+#### Manual GitHub Pages Deployment:
+
+1. Build the static site:
+   ```bash
+   cd frontend
+   npm run build
+   ```
+
+2. The static files will be in the `out/` directory
+3. These will be automatically deployed via GitHub Actions
 
 Environment variables need to be configured for the deployment environment.
 
