@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import Link from 'next/link';
@@ -17,7 +17,20 @@ export default function SignupPage() {
   const [passwordError, setPasswordError] = useState('');
 
   const router = useRouter();
-  const { register } = useAuth();
+  const { register, isAuthenticated } = useAuth();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      // Check if there's a redirect URL stored in sessionStorage
+      const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
+      sessionStorage.removeItem('redirectAfterLogin'); // Clean up
+
+      // Redirect to the originally requested page, or default to dashboard
+      const targetUrl = redirectUrl || '/dashboard';
+      router.replace(targetUrl);
+    }
+  }, [isAuthenticated, router]);
 
   // Email validation function
   const isValidEmail = (email) => {

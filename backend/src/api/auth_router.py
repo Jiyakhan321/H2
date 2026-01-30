@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlmodel import Session, select
@@ -144,7 +144,7 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
 
     # Calculate time until expiration
     exp_time = payload.get("exp")
-    current_time = datetime.utcnow().timestamp()
+    current_time = datetime.now(timezone.utc).timestamp()
     time_until_expiry = max(0, exp_time - current_time) if exp_time else 0
 
     return {

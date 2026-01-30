@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import TaskList from '../../components/TaskList';
 import TaskForm from '../../components/TaskForm';
@@ -11,17 +11,13 @@ import { Calendar, CheckCircle, Clock, AlertTriangle, Plus } from 'lucide-react'
 const DashboardPage = () => {
   const { user } = useAuth();
   const { tasks, loading, error, fetchTasks, createTask, updateTask, deleteTask, toggleTaskCompletion } = useTasks();
-  const hasLoadedRef = useRef(false);
 
   // Load tasks when component mounts and only if authenticated
   useEffect(() => {
-    if (user && !hasLoadedRef.current) {  // Only fetch tasks if user is authenticated and hasn't loaded yet
-      hasLoadedRef.current = true; // Mark as loaded to prevent future fetches
+    if (user) {  // Only fetch tasks if user is authenticated
       fetchTasks();
-    } else if (!user) {
-      hasLoadedRef.current = false; // Reset the loaded flag if user becomes unauthenticated
     }
-  }, [user, fetchTasks]); // Only re-run when user authentication status changes
+  }, [user]); // Only re-run when user authentication status changes - removed fetchTasks to prevent infinite loop
 
   const handleTaskCreated = async (taskData) => {
     try {
@@ -70,9 +66,15 @@ const DashboardPage = () => {
 
   // Calculate task statistics
   const totalTasks = tasks.length;
-  const completedTasks = tasks.filter(task => task.completed).length;
+ const completedTasks = tasks.filter(
+  task => task && task.completed
+).length;
+
   const pendingTasks = totalTasks - completedTasks;
-  const highPriorityTasks = tasks.filter(task => task.priority === 'high').length;
+ const highPriorityTasks = tasks.filter(
+  task => task && task.priority === 'high'
+).length;
+
 
   return (
     <ProtectedRoute>

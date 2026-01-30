@@ -9,7 +9,6 @@ load_dotenv()
 # Import models to register them with SQLModel
 from src.models.user import User
 from src.models.todo_task import TodoTask
-
 # Database URL from environment variable
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@localhost/todo_db")
 

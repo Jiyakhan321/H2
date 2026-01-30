@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Mail, Lock, Loader2 } from 'lucide-react';
+import { Mail, Lock, Loader2, Wifi, AlertCircle } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -27,16 +27,38 @@ const Login = () => {
     setError('');
 
     try {
+      console.log('Login component: Calling login function with email:', email);
       const result = await login(email, password);
+      console.log('Login component: Login result:', result);
+
       if (result.success) {
+        console.log('Login component: Login successful, navigating to dashboard');
         router.push('/dashboard'); // Redirect to dashboard after login
       } else {
+        console.log('Login component: Login failed with error:', result.error);
         setError(result.error);
       }
     } catch (err) {
-      setError('An unexpected error occurred');
+      console.error('Login component: Unexpected error during login:', err);
+      setError('An unexpected error occurred during login');
     } finally {
+      console.log('Login component: Setting loading to false');
       setLoading(false);
+    }
+  };
+
+  // Determine icon based on error type
+  const getErrorIcon = () => {
+    if (error && (error.includes('timeout') || error.includes('network') || error.includes('connection'))) {
+      return <Wifi className="w-5 h-5 text-red-500 dark:text-red-400 mr-2" />;
+    } else if (error && (error.includes('server') || error.includes('500'))) {
+      return <AlertCircle className="w-5 h-5 text-red-500 dark:text-red-400 mr-2" />;
+    } else {
+      return (
+        <svg className="w-5 h-5 text-red-500 dark:text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+        </svg>
+      );
     }
   };
 
@@ -52,9 +74,7 @@ const Login = () => {
       {error && (
         <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
           <div className="flex items-center">
-            <svg className="w-5 h-5 text-red-500 dark:text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-            </svg>
+            {getErrorIcon()}
             <span className="text-red-700 dark:text-red-300 text-sm font-medium">{error}</span>
           </div>
         </div>

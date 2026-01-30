@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import Link from 'next/link';
-import { Mail, Lock, Loader2, LogIn, AlertCircle, User } from 'lucide-react';
+import { Mail, Lock, Loader2, LogIn, AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -14,7 +14,20 @@ export default function LoginPage() {
   const [passwordError, setPasswordError] = useState('');
 
   const router = useRouter();
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      // Check if there's a redirect URL stored in sessionStorage
+      const redirectUrl = sessionStorage.getItem('redirectAfterLogin');
+      sessionStorage.removeItem('redirectAfterLogin'); // Clean up
+
+      // Redirect to the originally requested page, or default to dashboard
+      const targetUrl = redirectUrl || '/dashboard';
+      router.replace(targetUrl);
+    }
+  }, [isAuthenticated, router]);
 
   // Password validation function
   const isValidPassword = (password) => {
